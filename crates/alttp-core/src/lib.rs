@@ -5,9 +5,12 @@
 //! Routines are added under `bankXX` modules, one unit per function.
 //! See harness `docs/01-methodology.md` and `docs/02-conventions.md`.
 
+pub mod bank00;
+pub mod cpu;
 pub mod hw;
 pub mod wram;
 
+pub use cpu::Cpu;
 pub use hw::Hw;
 pub use wram::Wram;
 
@@ -15,11 +18,16 @@ pub use wram::Wram;
 pub struct State {
     pub wram: Wram,
     pub hw: Hw,
+    pub cpu: Cpu,
 }
 
 impl State {
     pub fn new() -> Self {
-        State { wram: Wram::new(), hw: Hw::default() }
+        State {
+            wram: Wram::new(),
+            hw: Hw::default(),
+            cpu: Cpu::default(),
+        }
     }
 }
 

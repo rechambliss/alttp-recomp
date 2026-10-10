@@ -7,7 +7,12 @@ pub const SIZE: usize = 0x2_0000;
 
 /// Named WRAM addresses. Add entries as units establish them.
 /// Every entry should also appear in harness `knowledge/ram-map.md`.
-pub mod addr {}
+pub mod addr {
+    pub const IRQ_ENABLE_REQ: u16 = 0x0128;
+    pub const NMI_ALT_THREAD: u16 = 0x012A;
+    pub const IRQ_BG3HOFS: u16 = 0x0630;
+    pub const ALT_THREAD_SP: u16 = 0x1F0A;
+}
 
 pub struct Wram {
     bytes: Box<[u8; SIZE]>,
@@ -15,7 +20,9 @@ pub struct Wram {
 
 impl Wram {
     pub fn new() -> Self {
-        Wram { bytes: Box::new([0; SIZE]) }
+        Wram {
+            bytes: Box::new([0; SIZE]),
+        }
     }
 
     /// Converts `$7E:AAAA` / `$7F:AAAA` into an offset. Panics on other banks:
