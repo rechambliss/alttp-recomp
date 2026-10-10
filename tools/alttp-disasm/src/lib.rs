@@ -109,8 +109,38 @@ pub struct Options {
     pub noreturn: HashSet<u32>,
     /// Known jump tables: table address -> (entry count, long entries?).
     pub tables: BTreeMap<u32, (usize, bool)>,
+    /// Jump tables split into parallel byte tables: low, high, optional bank, entry count.
+    /// Without a bank table, targets are in the low table's bank.
+    pub split_tables: Vec<SplitTable>,
     /// Max instructions before giving up (guards against decoding data as code).
     pub max_insns: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SplitTable {
+    pub lo: u32,
+    pub hi: u32,
+    pub bank: Option<u32>,
+    pub count: usize,
+}
+
+fn read_split_table(mem: &dyn Mem, t: &SplitTable) -> Result<Vec<u32>, String> {
+    let byte = |base: u32, i: usize| {
+        let a = (base as u16).wrapping_add(i as u16);
+        let b = (base >> 16) as u8;
+        mem.read(b, a).ok_or_else(|| format!("split table byte at {} unreadable", fmt_addr(full(b, a))))
+    };
+    (0..t.count)
+        .map(|i| {
+            let lo = byte(t.lo, i)? as u32;
+            let hi = byte(t.hi, i)? as u32;
+            let bank = match t.bank {
+                Some(b) => byte(b, i)? as u32,
+                None => t.lo >> 16,
+            };
+            Ok(bank << 16 | hi << 8 | lo)
+        })
+        .collect()
 }
 
 #[derive(Debug, Default)]
@@ -337,6 +367,12 @@ pub fn trace(mem: &dyn Mem, entry: u32, mx0: Mx, opt: &Options) -> Trace {
             work.push(f);
         }
     }
+    for st in &opt.split_tables {
+        match read_split_table(mem, st) {
+            Ok(targets) => t.jump_tables.push(JumpTable { at: st.lo, entries: st.count, targets, kind: "split byte tables" }),
+            Err(e) => t.warnings.push(e),
+        }
+    }
     if preserved_calls > 0 {
         t.warnings.push(format!("{preserved_calls} call(s) assume the callee preserves M/X; confirm when the callee is mapped"));
     }
@@ -536,6 +572,24 @@ mod tests {
         let t = trace(&mem, 0x8000, m8x8(), &opt);
         assert_eq!(t.insns.len(), 1, "table bytes must not be decoded as code");
         assert_eq!(t.jump_tables[0].targets, vec![0x8100, 0x8200]);
+    }
+
+    #[test]
+    fn split_byte_tables_decoded() {
+        // lo at $8100, hi at $8110, bank at $8120; 2 entries -> $02:9000, $03:A0B0
+        let mut mem = TestMem::new(0x8000, &[0x6B]);
+        mem.put(0x8100, &[0x00, 0xB0]);
+        mem.put(0x8110, &[0x90, 0xA0]);
+        mem.put(0x8120, &[0x02, 0x03]);
+        let mut opt = Options::default();
+        opt.split_tables.push(SplitTable { lo: 0x8100, hi: 0x8110, bank: Some(0x8120), count: 2 });
+        let t = trace(&mem, 0x8000, m8x8(), &opt);
+        assert_eq!(t.jump_tables[0].targets, vec![0x029000, 0x03A0B0]);
+        assert!(render_summary(&t).contains("{ at = \"$00:8100\", entries = 2, targets = [\"029000\", \"03a0b0\"] }"));
+        // without a bank table, targets stay in the table's bank
+        opt.split_tables[0].bank = None;
+        let t = trace(&mem, 0x8000, m8x8(), &opt);
+        assert_eq!(t.jump_tables[0].targets, vec![0x009000, 0x00A0B0]);
     }
 
     #[test]

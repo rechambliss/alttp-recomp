@@ -17,6 +17,9 @@ trace options
   --stop-at A,B,...     other units' entries; jumping there ends the path (tail exit)
   --noreturn A,B,...    routines that never return to the caller
   --table A=N[L],...    jump table at A with N entries (L = 24-bit entries)
+  --split-table LO,HI[,BANK]=N
+                        jump table stored as parallel byte tables (repeatable).
+                        No BANK table: targets are in LO's bank.
   --max N               instruction cap (default 4000)
   --summary-only        print only the ledger [map] block
   --listing-only        print only the listing
@@ -65,6 +68,16 @@ fn run() -> Result<(), String> {
                     let n: usize = n.trim_end_matches(['L', 'l']).parse().map_err(|_| format!("bad count in '{spec}'"))?;
                     opt.tables.insert(parse_addr(a).ok_or(format!("bad address '{a}'"))?, (n, long));
                 }
+            }
+            "--split-table" => {
+                let spec = val()?;
+                let (addrs, n) = spec.split_once('=').ok_or(format!("bad --split-table '{spec}', want LO,HI[,BANK]=N"))?;
+                let a = parse_list(addrs)?;
+                if !(2..=3).contains(&a.len()) {
+                    return Err(format!("--split-table needs 2 or 3 addresses, got {}", a.len()));
+                }
+                let count: usize = n.parse().map_err(|_| format!("bad count in '{spec}'"))?;
+                opt.split_tables.push(SplitTable { lo: a[0], hi: a[1], bank: a.get(2).copied(), count });
             }
             "--max" => opt.max_insns = val()?.parse().map_err(|_| "bad --max")?,
             "--summary-only" => summary_only = true,

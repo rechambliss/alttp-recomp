@@ -20,6 +20,7 @@ What it handles:
 - Branches, BRA/BRL, and JMP/JML (followed, and listed so you can mark tail calls with `--stop-at`).
 - JSR/JSL recorded as callees. The tool assumes they preserve M/X, and the warning says so.
 - Jump tables via `JMP (abs,X)` and `JSR (abs,X)` with `--table`, and inline tables after `--noreturn` calls.
+- Jump tables stored as parallel byte tables (low, high, bank) with `--split-table LO,HI[,BANK]=N`. Example: the module dispatcher at `$00:80B5`.
 - Indirect `JMP (abs)` and `JML [abs]` are flagged, since their targets are runtime data.
 
 Not handled yet: code that runs from WRAM, or tracking the E flag after `XCE` (flagged for manual review).
