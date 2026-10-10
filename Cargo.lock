@@ -15,6 +15,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "alttp-disasm"
+version = "0.1.0"
+dependencies = [
+ "alttp-rom",
+]
+
+[[package]]
 name = "alttp-rom"
 version = "0.1.0"
 dependencies = [

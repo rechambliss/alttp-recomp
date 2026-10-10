@@ -5,6 +5,7 @@ members = [
     "crates/alttp-core",
     "crates/alttp-verify",
     "crates/alttp-desktop",
+    "tools/alttp-disasm",
 ]
 
 [workspace.package]
