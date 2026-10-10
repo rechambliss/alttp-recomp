@@ -18,6 +18,14 @@ pub mod addr {
     pub const JOY1_PREV_AXLR: u16 = 0x00FA;
     pub const IRQ_BG3HOFS: u16 = 0x0630;
     pub const OAM_BUFFER_LOW: u16 = 0x0800;
+    pub const OAM_BUFFER_HIGH: u16 = 0x0A00;
+    pub const OAM_EXT_BITS: u16 = 0x0A20;
+    pub const FRAME_UPLOAD_PTRS: u16 = 0x0AC0;
+    /// $7E:C00D (bank $7E offset).
+    pub const ANIM_TILE_TIMER_A: u16 = 0xC00D;
+    pub const ANIM_TILE_OFS_A: u16 = 0xC00F;
+    pub const ANIM_TILE_TIMER_B: u16 = 0xC013;
+    pub const ANIM_TILE_IDX_B: u16 = 0xC015;
     pub const ALT_THREAD_SP: u16 = 0x1F0A;
 }
 
