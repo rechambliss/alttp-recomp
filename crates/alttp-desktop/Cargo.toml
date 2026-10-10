@@ -1,0 +1,9 @@
+[package]
+name = "alttp-desktop"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+alttp-rom.workspace = true
+alttp-core.workspace = true

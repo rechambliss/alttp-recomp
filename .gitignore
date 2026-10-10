@@ -1,0 +1,15 @@
+/target
+
+# ROMs and anything derived from them. Never commit. See harness docs/03-legal-hygiene.md
+*.sfc
+*.smc
+*.SFC
+*.SMC
+*.bin
+*.bps
+*.ips
+*.srm
+*.state
+/asset-cache/
+/disasm/
+/captures/

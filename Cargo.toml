@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/alttp-rom",
+    "crates/alttp-core",
+    "crates/alttp-verify",
+    "crates/alttp-desktop",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+publish = false
+
+[workspace.dependencies]
+alttp-rom = { path = "crates/alttp-rom" }
+alttp-core = { path = "crates/alttp-core" }
+alttp-verify = { path = "crates/alttp-verify" }
+sha1 = "0.10"

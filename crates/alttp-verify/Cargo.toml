@@ -1,0 +1,8 @@
+[package]
+name = "alttp-verify"
+edition.workspace = true
+version.workspace = true
+publish.workspace = true
+
+[dependencies]
+alttp-core.workspace = true
