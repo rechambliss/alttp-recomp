@@ -10,6 +10,12 @@ pub const SIZE: usize = 0x2_0000;
 pub mod addr {
     pub const IRQ_ENABLE_REQ: u16 = 0x0128;
     pub const NMI_ALT_THREAD: u16 = 0x012A;
+    pub const JOY1_HELD_BYSTUDLR: u16 = 0x00F0;
+    pub const JOY1_HELD_AXLR: u16 = 0x00F2;
+    pub const JOY1_NEW_BYSTUDLR: u16 = 0x00F4;
+    pub const JOY1_NEW_AXLR: u16 = 0x00F6;
+    pub const JOY1_PREV_BYSTUDLR: u16 = 0x00F8;
+    pub const JOY1_PREV_AXLR: u16 = 0x00FA;
     pub const IRQ_BG3HOFS: u16 = 0x0630;
     pub const OAM_BUFFER_LOW: u16 = 0x0800;
     pub const ALT_THREAD_SP: u16 = 0x1F0A;
